@@ -8,9 +8,7 @@ import (
 func main() {
 	// Common types
 	if err := gen.WriteTupleEncodersToFile("./pkg/types_gen.go", "storage",
-		storage.SectorInfo{},
-		storage.SealTicket{},
-		storage.SealSeed{},
+		storage.PoStCandidateWithTicket{},
 	); err != nil {
 		panic(err)
 	}

@@ -31,7 +31,8 @@ type Proof []byte
 
 type Sealer interface {
 	SealPreCommit1(ctx context.Context, sectorNum abi.SectorNumber, ticket abi.SealRandomness, pieces []abi.PieceInfo) (PreCommit1Out, error)
-	SealPreCommit2(ctx context.Context, sectorNum abi.SectorNumber, preCommit1Out PreCommit1Out) (sealedCID cid.Cid, unsealedCID cid.Cid, err error)
+	SealPreCommit2(context.Context, abi.SectorNumber, PreCommit1Out) (sealedCID cid.Cid, unsealedCID cid.Cid, err error)
 	SealCommit1(ctx context.Context, sectorNum abi.SectorNumber, ticket abi.SealRandomness, seed abi.InteractiveSealRandomness, pieces []abi.PieceInfo, sealedCID cid.Cid, unsealedCID cid.Cid) (Commit1Out, error)
-	SealCommit2(ctx context.Context, sectorNum abi.SectorNumber, commit1Out Commit1Out) (Proof, error)
+	SealCommit2(context.Context, abi.SectorNumber, Commit1Out) (Proof, error)
+	FinalizeSector(context.Context, abi.SectorNumber) error
 }

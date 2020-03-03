@@ -14,7 +14,7 @@ type Storage interface {
 	// Creates a new empty sector
 	NewSector(ctx context.Context) (abi.SectorNumber, error)
 	// Add a piece to an existing *unsealed* sector
-	AddPiece(ctx context.Context, sector abi.SectorNumber, pieces []abi.PieceInfo, pieceSize abi.UnpaddedPieceSize, r Data) (abi.PieceInfo, error)
+	AddPiece(ctx context.Context, sector abi.SectorNumber, pieceSizes []abi.UnpaddedPieceSize, newPieceSize abi.UnpaddedPieceSize, pieceData Data) (abi.PieceInfo, error)
 }
 
 type Verifier interface {

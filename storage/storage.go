@@ -4,23 +4,30 @@ import (
 	"context"
 	"io"
 
-	"github.com/filecoin-project/specs-actors/actors/abi"
 	"github.com/ipfs/go-cid"
+
+	"github.com/filecoin-project/specs-actors/actors/abi"
 )
 
 type Data = io.Reader
 
 type Storage interface {
-	// Creates a new empty sector
-	NewSector(ctx context.Context) (abi.SectorNumber, error)
+	// Creates a new empty sector (only allocate on disk. Layers above
+	//  storage are responsible for assigning sector IDs)
+	NewSector(ctx context.Context, sector abi.SectorID) error
 	// Add a piece to an existing *unsealed* sector
-	AddPiece(ctx context.Context, sector abi.SectorNumber, pieceSizes []abi.UnpaddedPieceSize, newPieceSize abi.UnpaddedPieceSize, pieceData Data) (abi.PieceInfo, error)
+	AddPiece(ctx context.Context, sector abi.SectorID, pieceSizes []abi.UnpaddedPieceSize, newPieceSize abi.UnpaddedPieceSize, pieceData Data) (abi.PieceInfo, error)
+}
+
+type FallbackPostOut struct {
+	PoStInputs []PoStCandidateWithTicket
+	Proof      []abi.PoStProof
 }
 
 type Prover interface {
-	GenerateEPostCandidates(sectorInfo []abi.SectorInfo, challengeSeed abi.PoStRandomness, faults []abi.SectorNumber) ([]PoStCandidateWithTicket, error)
-	GenerateFallbackPoSt(sectorInfo []abi.SectorInfo, challengeSeed abi.PoStRandomness, faults []abi.SectorNumber) ([]PoStCandidateWithTicket, []abi.PoStProof, error)
-	ComputeElectionPoSt(sectorInfo []abi.SectorInfo, challengeSeed abi.PoStRandomness, winners []abi.PoStCandidate) ([]abi.PoStProof, error)
+	GenerateEPostCandidates(ctx context.Context, miner abi.ActorID, sectorInfo []abi.SectorInfo, challengeSeed abi.PoStRandomness, faults []abi.SectorNumber) ([]PoStCandidateWithTicket, error)
+	GenerateFallbackPoSt(ctx context.Context, miner abi.ActorID, sectorInfo []abi.SectorInfo, challengeSeed abi.PoStRandomness, faults []abi.SectorNumber) (FallbackPostOut, error)
+	ComputeElectionPoSt(ctx context.Context, miner abi.ActorID, sectorInfo []abi.SectorInfo, challengeSeed abi.PoStRandomness, winners []abi.PoStCandidate) ([]abi.PoStProof, error)
 }
 
 type PreCommit1Out []byte
@@ -29,10 +36,15 @@ type Commit1Out []byte
 
 type Proof []byte
 
+type SectorCids struct {
+	Unsealed cid.Cid
+	Sealed   cid.Cid
+}
+
 type Sealer interface {
-	SealPreCommit1(ctx context.Context, sectorNum abi.SectorNumber, ticket abi.SealRandomness, pieces []abi.PieceInfo) (PreCommit1Out, error)
-	SealPreCommit2(context.Context, abi.SectorNumber, PreCommit1Out) (sealedCID cid.Cid, unsealedCID cid.Cid, err error)
-	SealCommit1(ctx context.Context, sectorNum abi.SectorNumber, ticket abi.SealRandomness, seed abi.InteractiveSealRandomness, pieces []abi.PieceInfo, sealedCID cid.Cid, unsealedCID cid.Cid) (Commit1Out, error)
-	SealCommit2(context.Context, abi.SectorNumber, Commit1Out) (Proof, error)
-	FinalizeSector(context.Context, abi.SectorNumber) error
+	SealPreCommit1(ctx context.Context, sector abi.SectorID, ticket abi.SealRandomness, pieces []abi.PieceInfo) (PreCommit1Out, error)
+	SealPreCommit2(ctx context.Context, sector abi.SectorID, pc1o PreCommit1Out) (SectorCids, error)
+	SealCommit1(ctx context.Context, sector abi.SectorID, ticket abi.SealRandomness, seed abi.InteractiveSealRandomness, pieces []abi.PieceInfo, cids SectorCids) (Commit1Out, error)
+	SealCommit2(ctx context.Context, sector abi.SectorID, c1o Commit1Out) (Proof, error)
+	FinalizeSector(ctx context.Context, sector abi.SectorID) error
 }

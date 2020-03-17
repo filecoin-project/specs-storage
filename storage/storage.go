@@ -12,7 +12,8 @@ import (
 type Data = io.Reader
 
 type Storage interface {
-	// Creates a new empty sector
+	// Creates a new empty sector (only allocate on disk. Layers above
+	//  storage are responsible for assigning sector IDs)
 	NewSector(ctx context.Context, sector abi.SectorID) error
 	// Add a piece to an existing *unsealed* sector
 	AddPiece(ctx context.Context, sector abi.SectorID, pieceSizes []abi.UnpaddedPieceSize, newPieceSize abi.UnpaddedPieceSize, pieceData Data) (abi.PieceInfo, error)

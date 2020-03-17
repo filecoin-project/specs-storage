@@ -13,7 +13,7 @@ type Data = io.Reader
 
 type Storage interface {
 	// Creates a new empty sector
-	NewSector(ctx context.Context, miner abi.ActorID) (abi.SectorID, error)
+	NewSector(ctx context.Context, sector abi.SectorID) error
 	// Add a piece to an existing *unsealed* sector
 	AddPiece(ctx context.Context, sector abi.SectorID, pieceSizes []abi.UnpaddedPieceSize, newPieceSize abi.UnpaddedPieceSize, pieceData Data) (abi.PieceInfo, error)
 }

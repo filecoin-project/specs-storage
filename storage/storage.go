@@ -44,6 +44,11 @@ type SectorCids struct {
 type Sealer interface {
 	SealPreCommit1(ctx context.Context, sector abi.SectorID, ticket abi.SealRandomness, pieces []abi.PieceInfo) (PreCommit1Out, error)
 	SealPreCommit2(ctx context.Context, sector abi.SectorID, pc1o PreCommit1Out) (SectorCids, error)
+
+	// MakeProvable makes sure that sector is ready to receive challenges from
+	//  proving calls
+	MakeProvable(ctx context.Context, sector abi.SectorID) error
+
 	SealCommit1(ctx context.Context, sector abi.SectorID, ticket abi.SealRandomness, seed abi.InteractiveSealRandomness, pieces []abi.PieceInfo, cids SectorCids) (Commit1Out, error)
 	SealCommit2(ctx context.Context, sector abi.SectorID, c1o Commit1Out) (Proof, error)
 	FinalizeSector(ctx context.Context, sector abi.SectorID) error

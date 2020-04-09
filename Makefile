@@ -23,7 +23,3 @@ tidy:
 lint:
 	$(GOLINT) run ./...
 .PHONY: lint
-
-gen:
-	$(GO_BIN) run ./gen/gen.go
-.PHONY: gen

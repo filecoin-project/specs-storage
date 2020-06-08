@@ -21,7 +21,7 @@ type Storage interface {
 
 type Prover interface {
 	GenerateWinningPoSt(ctx context.Context, minerID abi.ActorID, sectorInfo []abi.SectorInfo, randomness abi.PoStRandomness) ([]abi.PoStProof, error)
-	GenerateWindowPoSt(ctx context.Context, minerID abi.ActorID, sectorInfo []abi.SectorInfo, randomness abi.PoStRandomness) ([]abi.PoStProof, error)
+	GenerateWindowPoSt(ctx context.Context, minerID abi.ActorID, sectorInfo []abi.SectorInfo, randomness abi.PoStRandomness) (proof []abi.PoStProof, skipped []abi.SectorID, err error)
 }
 
 type PreCommit1Out []byte

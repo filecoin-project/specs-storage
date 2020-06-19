@@ -35,10 +35,25 @@ type SectorCids struct {
 	Sealed   cid.Cid
 }
 
+type Range struct {
+	Offset abi.UnpaddedPieceSize
+	Size   abi.UnpaddedPieceSize
+}
+
 type Sealer interface {
 	SealPreCommit1(ctx context.Context, sector abi.SectorID, ticket abi.SealRandomness, pieces []abi.PieceInfo) (PreCommit1Out, error)
 	SealPreCommit2(ctx context.Context, sector abi.SectorID, pc1o PreCommit1Out) (SectorCids, error)
+
 	SealCommit1(ctx context.Context, sector abi.SectorID, ticket abi.SealRandomness, seed abi.InteractiveSealRandomness, pieces []abi.PieceInfo, cids SectorCids) (Commit1Out, error)
 	SealCommit2(ctx context.Context, sector abi.SectorID, c1o Commit1Out) (Proof, error)
-	FinalizeSector(ctx context.Context, sector abi.SectorID) error
+
+	FinalizeSector(ctx context.Context, sector abi.SectorID, keepUnsealed []Range) error
+
+	// ReleaseUnsealed marks parts of the unsealed sector file as safe to drop
+	//  (called by the fsm on restart, allows storage to keep no persistent
+	//   state about unsealed fast-retrieval copies)
+	ReleaseUnsealed(ctx context.Context, sector abi.SectorID, safeToFree []Range) error
+
+	// Removes all data associated with the specified sector
+	Remove(ctx context.Context, sector abi.SectorID) error
 }

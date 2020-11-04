@@ -12,12 +12,17 @@ import (
 
 type Data = io.Reader
 
+type SectorRef struct {
+	ID        abi.SectorID
+	ProofType abi.RegisteredSealProof
+}
+
 type Storage interface {
 	// Creates a new empty sector (only allocate on disk. Layers above
 	//  storage are responsible for assigning sector IDs)
-	NewSector(ctx context.Context, sector abi.SectorID) error
+	NewSector(ctx context.Context, sector SectorRef) error
 	// Add a piece to an existing *unsealed* sector
-	AddPiece(ctx context.Context, sector abi.SectorID, pieceSizes []abi.UnpaddedPieceSize, newPieceSize abi.UnpaddedPieceSize, pieceData Data) (abi.PieceInfo, error)
+	AddPiece(ctx context.Context, sector SectorRef, pieceSizes []abi.UnpaddedPieceSize, newPieceSize abi.UnpaddedPieceSize, pieceData Data) (abi.PieceInfo, error)
 }
 
 type Prover interface {
@@ -42,19 +47,19 @@ type Range struct {
 }
 
 type Sealer interface {
-	SealPreCommit1(ctx context.Context, sector abi.SectorID, ticket abi.SealRandomness, pieces []abi.PieceInfo) (PreCommit1Out, error)
-	SealPreCommit2(ctx context.Context, sector abi.SectorID, pc1o PreCommit1Out) (SectorCids, error)
+	SealPreCommit1(ctx context.Context, sector SectorRef, ticket abi.SealRandomness, pieces []abi.PieceInfo) (PreCommit1Out, error)
+	SealPreCommit2(ctx context.Context, sector SectorRef, pc1o PreCommit1Out) (SectorCids, error)
 
-	SealCommit1(ctx context.Context, sector abi.SectorID, ticket abi.SealRandomness, seed abi.InteractiveSealRandomness, pieces []abi.PieceInfo, cids SectorCids) (Commit1Out, error)
-	SealCommit2(ctx context.Context, sector abi.SectorID, c1o Commit1Out) (Proof, error)
+	SealCommit1(ctx context.Context, sector SectorRef, ticket abi.SealRandomness, seed abi.InteractiveSealRandomness, pieces []abi.PieceInfo, cids SectorCids) (Commit1Out, error)
+	SealCommit2(ctx context.Context, sector SectorRef, c1o Commit1Out) (Proof, error)
 
-	FinalizeSector(ctx context.Context, sector abi.SectorID, keepUnsealed []Range) error
+	FinalizeSector(ctx context.Context, sector SectorRef, keepUnsealed []Range) error
 
 	// ReleaseUnsealed marks parts of the unsealed sector file as safe to drop
 	//  (called by the fsm on restart, allows storage to keep no persistent
 	//   state about unsealed fast-retrieval copies)
-	ReleaseUnsealed(ctx context.Context, sector abi.SectorID, safeToFree []Range) error
+	ReleaseUnsealed(ctx context.Context, sector SectorRef, safeToFree []Range) error
 
 	// Removes all data associated with the specified sector
-	Remove(ctx context.Context, sector abi.SectorID) error
+	Remove(ctx context.Context, sector SectorRef) error
 }

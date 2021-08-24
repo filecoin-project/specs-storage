@@ -22,7 +22,9 @@ type Storage interface {
 	//  storage are responsible for assigning sector IDs)
 	NewSector(ctx context.Context, sector SectorRef) error
 	// Add a piece to an existing *unsealed* sector
-	AddPiece(ctx context.Context, sector SectorRef, pieceSizes []abi.UnpaddedPieceSize, newPieceSize abi.UnpaddedPieceSize, pieceData Data) (abi.PieceInfo, error)
+	//
+	// nil expectPieceCid disables the expected piece CID check for testing purposes.
+	AddPiece(ctx context.Context, sector SectorRef, pieceSizes []abi.UnpaddedPieceSize, newPieceSize abi.UnpaddedPieceSize, expectPieceCid *cid.Cid, pieceData Data) (abi.PieceInfo, error)
 }
 
 type Prover interface {

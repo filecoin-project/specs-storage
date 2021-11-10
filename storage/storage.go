@@ -46,6 +46,8 @@ type Range struct {
 	Size   abi.UnpaddedPieceSize
 }
 
+type ReplicaUpdateProof []byte
+
 type Sealer interface {
 	SealPreCommit1(ctx context.Context, sector SectorRef, ticket abi.SealRandomness, pieces []abi.PieceInfo) (PreCommit1Out, error)
 	SealPreCommit2(ctx context.Context, sector SectorRef, pc1o PreCommit1Out) (SectorCids, error)
@@ -62,4 +64,11 @@ type Sealer interface {
 
 	// Removes all data associated with the specified sector
 	Remove(ctx context.Context, sector SectorRef) error
+
+	// Generate snap deals replica update and return proof
+	ReplicaUpdate(ctx context.Context, sector SectorRef, pieces []abi.PieceInfo) (ReplicaUpdateProof, error)
+
+	// ReleaseSealed marks old replicas as safe to drop. Called by fsm
+	// after replica update replaces original replica.
+	ReleaseSealed(ctx context.Context, sector SectorRef) error
 }

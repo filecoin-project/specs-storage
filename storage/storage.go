@@ -66,7 +66,7 @@ type Sealer interface {
 	Remove(ctx context.Context, sector SectorRef) error
 
 	// Generate snap deals replica update and return proof
-	ReplicaUpdate(ctx context.Context, sector SectorRef, pieces []abi.PieceInfo) (ReplicaUpdateProof, error)
+	ReplicaUpdate(ctx context.Context, sector SectorRef, pieces []abi.PieceInfo, sectorKey cid.Cid) (ReplicaUpdateProof, error)
 
 	// ReleaseSealed marks old replicas as safe to drop. Called by fsm
 	// after replica update replaces original replica.

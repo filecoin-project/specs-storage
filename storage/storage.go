@@ -47,6 +47,7 @@ type Range struct {
 }
 
 type ReplicaUpdateProof []byte
+type ReplicaVanillaProofs [][]byte
 
 type ReplicaUpdateOut struct {
 	NewSealed   cid.Cid
@@ -74,7 +75,8 @@ type Sealer interface {
 	ReplicaUpdate(ctx context.Context, sector SectorRef, pieces []abi.PieceInfo) (ReplicaUpdateOut, error)
 
 	// Prove that snap deals replica was done correctly
-	ProveReplicaUpdate(ctx context.Context, sector SectorRef, sectorKey, newSealed, newUnsealed cid.Cid) (ReplicaUpdateProof, error)
+	ProveReplicaUpdate1(ctx context.Context, sector SectorRef, sectorKey, newSealed, newUnsealed cid.Cid) (ReplicaVanillaProofs, error)
+	ProveReplicaUpdate2(ctx context.Context, sector SectorRef, sectorKey, newSealed, newUnsealed cid.Cid, vanillaProofs ReplicaVanillaProofs) (ReplicaUpdateProof, error)
 
 	// ReleaseSealed marks old replicas as safe to drop. Called by fsm
 	// after replica update replaces original replica.

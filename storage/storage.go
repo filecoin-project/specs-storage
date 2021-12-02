@@ -78,7 +78,6 @@ type Sealer interface {
 	ProveReplicaUpdate1(ctx context.Context, sector SectorRef, sectorKey, newSealed, newUnsealed cid.Cid) (ReplicaVanillaProofs, error)
 	ProveReplicaUpdate2(ctx context.Context, sector SectorRef, sectorKey, newSealed, newUnsealed cid.Cid, vanillaProofs ReplicaVanillaProofs) (ReplicaUpdateProof, error)
 
-	// ReleaseSealed marks old replicas as safe to drop. Called by fsm
-	// after replica update replaces original replica.
-	ReleaseSealed(ctx context.Context, sector SectorRef) error
+	// GenerateSectorKeyFromData computes sector key given unsealed data and updated replica
+	GenerateSectorKeyFromData(ctx context.Context, sector SectorRef, unsealed cid.Cid) error
 }

@@ -47,6 +47,12 @@ type Range struct {
 }
 
 type ReplicaUpdateProof []byte
+type ReplicaVanillaProofs [][]byte
+
+type ReplicaUpdateOut struct {
+	NewSealed   cid.Cid
+	NewUnsealed cid.Cid
+}
 
 type Sealer interface {
 	SealPreCommit1(ctx context.Context, sector SectorRef, ticket abi.SealRandomness, pieces []abi.PieceInfo) (PreCommit1Out, error)
@@ -65,10 +71,13 @@ type Sealer interface {
 	// Removes all data associated with the specified sector
 	Remove(ctx context.Context, sector SectorRef) error
 
-	// Generate snap deals replica update and return proof
-	ReplicaUpdate(ctx context.Context, sector SectorRef, pieces []abi.PieceInfo) (ReplicaUpdateProof, error)
+	// Generate snap deals replica update
+	ReplicaUpdate(ctx context.Context, sector SectorRef, pieces []abi.PieceInfo) (ReplicaUpdateOut, error)
 
-	// ReleaseSealed marks old replicas as safe to drop. Called by fsm
-	// after replica update replaces original replica.
-	ReleaseSealed(ctx context.Context, sector SectorRef) error
+	// Prove that snap deals replica was done correctly
+	ProveReplicaUpdate1(ctx context.Context, sector SectorRef, sectorKey, newSealed, newUnsealed cid.Cid) (ReplicaVanillaProofs, error)
+	ProveReplicaUpdate2(ctx context.Context, sector SectorRef, sectorKey, newSealed, newUnsealed cid.Cid, vanillaProofs ReplicaVanillaProofs) (ReplicaUpdateProof, error)
+
+	// GenerateSectorKeyFromData computes sector key given unsealed data and updated replica
+	GenerateSectorKeyFromData(ctx context.Context, sector SectorRef, unsealed cid.Cid) error
 }

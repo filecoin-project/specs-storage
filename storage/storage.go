@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/filecoin-project/go-state-types/abi"
+	"github.com/filecoin-project/go-state-types/network"
 	"github.com/ipfs/go-cid"
 
 	proof "github.com/filecoin-project/specs-actors/v7/actors/runtime/proof"
@@ -26,7 +27,7 @@ type Storage interface {
 }
 
 type Prover interface {
-	GenerateWinningPoSt(ctx context.Context, minerID abi.ActorID, sectorInfo []proof.ExtendedSectorInfo, randomness abi.PoStRandomness, currEpoch abi.ChainEpoch) ([]proof.PoStProof, error)
+	GenerateWinningPoSt(ctx context.Context, minerID abi.ActorID, sectorInfo []proof.ExtendedSectorInfo, randomness abi.PoStRandomness, poStEpoch abi.ChainEpoch, version network.Version) ([]proof.PoStProof, error)
 	GenerateWindowPoSt(ctx context.Context, minerID abi.ActorID, sectorInfo []proof.SectorInfo, randomness abi.PoStRandomness) (proof []proof.PoStProof, skipped []abi.SectorID, err error)
 }
 

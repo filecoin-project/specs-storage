@@ -67,6 +67,8 @@ type Sealer interface {
 	//  (called by the fsm on restart, allows storage to keep no persistent
 	//   state about unsealed fast-retrieval copies)
 	ReleaseUnsealed(ctx context.Context, sector SectorRef, safeToFree []Range) error
+	ReleaseSectorKey(ctx context.Context, sector SectorRef) error
+	ReleaseReplicaUpgrade(ctx context.Context, sector SectorRef) error
 
 	// Removes all data associated with the specified sector
 	Remove(ctx context.Context, sector SectorRef) error

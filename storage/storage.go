@@ -82,4 +82,6 @@ type Sealer interface {
 
 	// GenerateSectorKeyFromData computes sector key given unsealed data and updated replica
 	GenerateSectorKeyFromData(ctx context.Context, sector SectorRef, unsealed cid.Cid) error
+
+	FinalizeReplicaUpdate(ctx context.Context, sector SectorRef, keepUnsealed []Range) error
 }

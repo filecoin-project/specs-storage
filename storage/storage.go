@@ -2,12 +2,11 @@ package storage
 
 import (
 	"context"
+	"github.com/filecoin-project/go-state-types/proof"
+	"github.com/ipfs/go-cid"
 	"io"
 
 	"github.com/filecoin-project/go-state-types/abi"
-	"github.com/ipfs/go-cid"
-
-	proof "github.com/filecoin-project/specs-actors/v7/actors/runtime/proof"
 )
 
 type Data = io.Reader
